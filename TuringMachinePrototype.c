@@ -112,16 +112,12 @@ const char* turing_add_one_program = "tape_size,32\n"
 
 int main()
 {
-
-
-	//PARSE TEXT INPUT
 	if (turing_add_one_program == nullptr) {
 		throw;
 	}
 	const char* start_needle = NULL;
 	const char* end_needle = NULL;
 
-	//READ TAPE SIZE
 	int read_tape_size = 1024;
 	start_needle = strstr(turing_add_one_program, "tape_size,");
 	if (start_needle == nullptr) {
@@ -135,7 +131,6 @@ int main()
 		read_tape_size = atoi(tape_size.c_str());
 	}
 
-	//READ START HEAD POS
 	start_needle = NULL;
 	end_needle = NULL;
 	int read_start_head_pos = 0;
@@ -151,7 +146,6 @@ int main()
 		read_start_head_pos = atoi(start_head_pos.c_str());
 	}
 
-	//READ START RULE
 	start_needle = NULL;
 	end_needle = NULL;
 	int read_start_rule = -1;
@@ -167,17 +161,14 @@ int main()
 		read_start_rule = atoi(start_rule.c_str());
 	}
 
-	//PARSE tape_conf
-	//BUT FIRST WE NEE TO SETUP THE TAPE SO WE DONT NEED A LIST OR ARRAY
-	tape.tape_size = read_tape_size; //TAPE SIZE
+	tape.tape_size = read_tape_size;
 	tape.create_tape();
 	tape.current_head_position = read_start_head_pos;
-	
-	//for print
+
 	if (tape.current_head_position + 1 > tape.max_reached_tape_position) {
 		tape.max_reached_tape_position = tape.current_head_position + 1;
 	}
-	//GET A TAPE CONF LINE
+
 	start_needle = strstr(turing_add_one_program, "tape_conf,");
 	const char* start_needle_file = start_needle;
 	const char* end_needle_line = strstr(start_needle, "\n");
@@ -199,13 +190,13 @@ int main()
 			tmp_string.append(start_needle, end_needle);
 			selected_char = new int();
 
-			*selected_char = atoi(tmp_string.c_str()); //damit wir auf 0 prüfen können ob ein valides char drin ist
+			*selected_char = atoi(tmp_string.c_str()); 
 			start_needle += tmp_string.size() + strlen(",");
-			//std::cout << *selected_char << std::endl;
+			
 		}
 		else if(was_char_pos && selected_char != nullptr){
 			if (start_needle == nullptr || strcmp(start_needle, "\n") == 0) {
-				//GET NEXT LINE IN FILE
+
 				start_needle = strstr(end_needle_line, "tape_conf,");
 				if (start_needle == nullptr) { break; }
 				end_needle_line = strstr(start_needle, "\n");
@@ -223,8 +214,8 @@ int main()
 				end_needle = strstr(start_needle, ",");
 				if (end_needle == nullptr) {
 					tmp_string.append(start_needle);
-					tape.tape_cells[atoi(tmp_string.c_str())] = *selected_char; //SET CHAR ON TAPE
-					//GET NEXT LINE IN FILE
+					tape.tape_cells[atoi(tmp_string.c_str())] = *selected_char; 
+
 					start_needle = strstr(end_needle_line, "tape_conf,");
 					if (start_needle == nullptr) { break; }
 					end_needle_line = strstr(start_needle, "\n");
@@ -240,38 +231,31 @@ int main()
 				else {
 					tmp_string = "";
 					tmp_string.append(start_needle,end_needle);
-					tape.tape_cells[atoi(tmp_string.c_str())] = *selected_char; //SET CHAR ON TAPE
+					tape.tape_cells[atoi(tmp_string.c_str())] = *selected_char;
 					start_needle += tmp_string.size() + strlen(",");
 				}
 			}
 		}
 		else {
-			//FAIL BREAK SHIT
+
 			throw;
 		}
 	}
 
-
-
-
-
-	//andere vorgehensweise zur demonstration
-	//hier zuerst all
-	//ja ich war
 	const char* rule_set_counter = strstr(turing_add_one_program, "rule_set,");
 	
 	int tileset_array_size = 0;
 	while (true) {
 		rule_set_counter = strstr(rule_set_counter, "rule_set,");
 		if (rule_set_counter != 0) {
-			rule_set_counter += strlen("rule_set,"); //skip rule_set,
+			rule_set_counter += strlen("rule_set,"); 
 			tileset_array_size++;
 		}
 		else {
 			break;
 		}
 	}
-	//NOW CREARTE ID ARRAY
+
 	int* found_id_count = new int[tileset_array_size];
 	std::string* found_rule_sets = new std::string[tileset_array_size];
 	for (size_t i = 0; i < tileset_array_size; i++)
@@ -305,7 +289,6 @@ int main()
 		}
 	}
 
-	//jetzt anzahlder uniquen rule sets_counten
 	int rs_u_id_counter = 0;
 	for (size_t i = 0; i < tileset_array_size; i++)
 	{
@@ -317,40 +300,36 @@ int main()
 		throw;
 	}
 
-
-
-	//WENN READ START RULE NOT EXISTS nach der 1 bei type schauen !!! bzw wen read start rule = -1
-
-	states = new STATE_DESC[rs_u_id_counter]; //PROGRAM STATES
+	states = new STATE_DESC[rs_u_id_counter];
 	if (states == nullptr) {
 		throw;
 	}
-	STATE_RULE rule; //TMP RULE STRUCT
+	STATE_RULE rule;
 
 	std::string tmp_str = "";
 	int st_id_counter = 0;
-	//NOW PARSE THE STRING AARAY AND CREATE STATES
+
 	for (size_t i = 0; i < rs_u_id_counter; i++)
 	{
-		//ALLOCATE STATE_RULES ARRAY
+
 		states[i].state_id = i;
 		states[i].state_rules_count = found_id_count[i];
 		if (found_id_count[i] <= 0) { continue; }
 		states[i].state_rules = new STATE_RULE[states[i].state_rules_count];
-		//PARSE STRING TO ARRAY
+
 		st_id_counter = 0;
 		for (size_t j = 0; j <tileset_array_size; j++)
 		{
 			const char* start_rule_needle = found_rule_sets[j].c_str();
 			const char* end_rule_needle = NULL;
 			if (start_rule_needle == nullptr) { throw; }
-			//start_rule_needle++;
+
 			end_rule_needle = strstr(start_rule_needle, ",");
 			tmp_str = "";
 			tmp_str.append(start_rule_needle, end_rule_needle);
-			//id correct ? 
+
 			if (atoi(tmp_str.c_str()) == states[i].state_id) {
-				//PARSE SWITCH ON CHAR
+
 				start_rule_needle = end_rule_needle + 1;
 				if (start_rule_needle == nullptr) { throw; }
 				end_rule_needle = strstr(start_rule_needle, ",");
@@ -358,7 +337,7 @@ int main()
 				tmp_id = "";
 				tmp_id.append(start_rule_needle, end_rule_needle);
 				states[i].state_rules[st_id_counter].switch_on_char = atoi(tmp_id.c_str());
-				//PARSE SET CHAR
+
 				start_rule_needle = end_rule_needle + 1;
 				if (start_rule_needle == nullptr) { throw; }
 				end_rule_needle = strstr(start_rule_needle, ",");
@@ -366,7 +345,7 @@ int main()
 				tmp_id = "";
 				tmp_id.append(start_rule_needle, end_rule_needle);
 				states[i].state_rules[st_id_counter].write_new_char = atoi(tmp_id.c_str());
-				//PARSE MOVE DIR
+
 				start_rule_needle = end_rule_needle + 1;
 				if (start_rule_needle == nullptr) { throw; }
 				end_rule_needle = strstr(start_rule_needle, ",");
@@ -374,7 +353,7 @@ int main()
 				tmp_id = "";
 				tmp_id.append(start_rule_needle, end_rule_needle);
 				states[i].state_rules[st_id_counter].move_tape_dir = atoi(tmp_id.c_str());
-				//PARSE TYPE
+
 				start_rule_needle = end_rule_needle + 1;
 				if (start_rule_needle == nullptr) { throw; }
 				end_rule_needle = strstr(start_rule_needle, ",");
@@ -396,17 +375,14 @@ int main()
 					states[i].state_rules[st_id_counter].rule_type = STATE_CONTROL::NORMAL;
 					break;
 				}
-				//PARSE NEXT STATE
+
 				start_rule_needle = end_rule_needle + 1;
 				if (start_rule_needle == nullptr) { throw; }
 				tmp_id = "";
 				tmp_id.append(start_rule_needle);
 				states[i].state_rules[st_id_counter].new_state_id = atoi(tmp_id.c_str());
 
-				
-					
-					//parse next shit
-					st_id_counter++; //++ for the next STATE slot
+					st_id_counter++; 
 			}
 			else {
 				continue;
@@ -446,12 +422,6 @@ int main()
 		}
 	}
 
-
-
-
-
-
-	//CLEANUP SHIT
 	for (size_t i = 0; i < rs_u_id_counter; i++)
 	{
 		states[i].destroy_state_rules();
