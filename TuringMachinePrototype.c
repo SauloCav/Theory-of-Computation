@@ -9,34 +9,34 @@ enum STATE_CONTROL
 {
 	NORMAL = 0,START = 1, END = 2
 };
-//STATE RULE DESC
+
 struct STATE_RULE
 {	
 	STATE_CONTROL rule_type;
-	int switch_on_char; // id char on tape pos, -1 blank, 0,1,....
-	int move_tape_dir; //0 no movement, -1 left, 1 right -> rule type = H
-	int write_new_char; //writes the new char to the cell
+	int switch_on_char;
+	int move_tape_dir; 
+	int write_new_char;
 	int new_state_id;
 	STATE_DESC* parent_state_desc;
-	//simple debug funktion
+
 	 void print_step(){
 		std::cout << "ON:" << switch_on_char << "->" << write_new_char << ",MOVE:" << move_tape_dir << " GOTO:"<< new_state_id << std::endl;
 	}
 };
-//STATE SET DESC
+
 struct STATE_DESC
 {
 	int state_id;
 	STATE_RULE* state_rules;
 	unsigned int state_rules_count;
-	//CLEANUP
+
 	void destroy_state_rules() {
 		delete state_rules;
 		state_rules = NULL;
 		state_rules_count = 0;
 	}
 };
-//TAPE DESC
+
 struct TAPE_DESC
 {
 	unsigned int tape_size;
@@ -52,7 +52,7 @@ struct TAPE_DESC
 		if (tape_cells == nullptr) { throw; }
 		for (size_t i = 0; i < tape_size; i++)
 		{
-			tape_cells[i] = -1; //BLANK
+			tape_cells[i] = -1;
 		}
 		max_reached_tape_position = 1;
 	}
@@ -96,33 +96,19 @@ struct TAPE_DESC
 	}
 };
 
-
-//VARIABLES
 STATE_DESC* states;
 TAPE_DESC tape;
 
-
-
-/*
-PROGRAM : ADD ONE TO BINARY
-syntax:
-tape_size,<size of tape> //size of tape
-start_head_pos,<start of the rw head> //start pos of the head
-start_rule,<rule set id>
-tape_conf,<char -1=blank >= 0 alphabet>,<tape_pos>,<tape_pos>,...
-rule_set,<rule_set_id>,<char to react>,<new char>,<tape movedir (-1,0,1),<rule_type 0=normal 1=start 2=end>,<next rule_set id>
-*/
 const char* turing_add_one_program = "tape_size,32\n"
 "start_head_pos,3\n"
 "start_rule,0\n"
-"tape_conf,1,1,2,3\n" //zelle 1,2,3 auf 1 setzten//RULESET 1 df
-"rule_set,0,0,1,-1,1,1\n" //<- START RULE
+"tape_conf,1,1,2,3\n"
+"rule_set,0,0,1,-1,1,1\n" 
 "rule_set,0,1,0,-1,0,0\n"
-"rule_set,0,-1,1,0,2,-1\n"//RULESET 2
+"rule_set,0,-1,1,0,2,-1\n"
 "rule_set,1,0,0,-1,0,1\n"
 "rule_set,1,1,1,-1,0,1\n"
-"rule_set,1,-1,-1,1,2,0\n";//eig kommt noch ein zweites aber durch die 2 wird direkt abgebrochen 
-
+"rule_set,1,-1,-1,1,2,0\n";
 
 int main()
 {
