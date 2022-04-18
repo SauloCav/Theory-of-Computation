@@ -272,7 +272,7 @@ int main()
 	while (true) {
 		rule_set_counter = strstr(rule_set_counter, "rule_set,");
 		if (rule_set_counter != 0) {
-			rule_set_counter += strlen("rule_set,"); //skip rule_set,
+			rule_set_counter += strlen("rule_set,");
 			rule_set_id_seperator = strstr(rule_set_counter, ",");
 			rule_set_id_seperator++;
 			found_rule_sets[std_counter] = "";
@@ -280,7 +280,7 @@ int main()
 			found_rule_sets[std_counter].append(rule_set_counter, rule_set_id_line);
 			tmp_id = "";
 			tmp_id.append(rule_set_counter, rule_set_id_seperator);
-			found_id_count[atoi(tmp_id.c_str())]++;	 //mit der id 0 gibt es so viele sets
+			found_id_count[atoi(tmp_id.c_str())]++;
 			tileset_array_size_id++;
 			std_counter++;
 		}
@@ -407,16 +407,16 @@ int main()
 
 	while (last_rule_state_flag != STATE_CONTROL::END )
 	{
-		for (size_t i = 0; i < states[current_state_pos].state_rules_count; i++) //fuer jede rule im aktuellen ruleset
+		for (size_t i = 0; i < states[current_state_pos].state_rules_count; i++)
 		{
-			if (states[current_state_pos].state_rules[i].switch_on_char == tape.tape_cells[tape.current_head_position]) { //wenn das char des lesekopfs dem rule char enspricht
-				states[current_state_pos].state_rules[i].print_step(); //debug ausgabe
-				tape.tape_cells[tape.current_head_position] = states[current_state_pos].state_rules[i].write_new_char; //setzte das neue char
-				tape.move_tape(states[current_state_pos].state_rules[i].move_tape_dir); //bewege das band
-				last_rule_state_flag = states[current_state_pos].state_rules[i].rule_type; //setzte neuen typ für schelifenabbruch
-				tape.print_tape(); //draw debug tabe
-				current_state_pos = states[current_state_pos].state_rules[i].new_state_id; //setze neue state id für den nächsten durchgang
-				break; //beende die schleife
+			if (states[current_state_pos].state_rules[i].switch_on_char == tape.tape_cells[tape.current_head_position]) {
+				states[current_state_pos].state_rules[i].print_step();
+				tape.tape_cells[tape.current_head_position] = states[current_state_pos].state_rules[i].write_new_char;
+				tape.move_tape(states[current_state_pos].state_rules[i].move_tape_dir);
+				last_rule_state_flag = states[current_state_pos].state_rules[i].rule_type;
+				tape.print_tape();
+				current_state_pos = states[current_state_pos].state_rules[i].new_state_id; 
+				break; 
 			}
 			
 		}
